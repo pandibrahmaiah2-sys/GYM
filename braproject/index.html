@@ -1,0 +1,591 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>IRONFORGE GYM</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --black: #0a0a0a;
+    --dark: #111111;
+    --card: #1a1a1a;
+    --orange: #ff4d00;
+    --orange2: #ff7a00;
+    --white: #f5f0eb;
+    --gray: #888;
+    --light: #ccc;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; scroll-behavior: smooth; }
+  body { background: var(--black); color: var(--white); font-family: 'Barlow', sans-serif; overflow-x: hidden; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 4px; }
+  ::-webkit-scrollbar-track { background: var(--dark); }
+  ::-webkit-scrollbar-thumb { background: var(--orange); }
+
+  /* NAV */
+  nav {
+    position: fixed; top: 0; width: 100%; z-index: 1000;
+    background: rgba(10,10,10,0.92); backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,77,0,0.2);
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 0 48px; height: 64px;
+  }
+  .logo { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--orange); letter-spacing: 3px; }
+  .logo span { color: var(--white); }
+  nav ul { display: flex; gap: 32px; list-style: none; }
+  nav ul a { color: var(--light); text-decoration: none; font-family: 'Barlow Condensed', sans-serif; font-weight: 600; font-size: 14px; letter-spacing: 2px; text-transform: uppercase; transition: color 0.3s; }
+  nav ul a:hover { color: var(--orange); }
+
+  /* HERO */
+  #home {
+    min-height: 100vh; position: relative; display: flex; align-items: center;
+    background: linear-gradient(135deg, #0a0a0a 0%, #1a0800 50%, #0a0a0a 100%);
+    overflow: hidden;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: url('https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=1600&q=80') center/cover no-repeat;
+    opacity: 0.18;
+  }
+  .hero-grid {
+    position: absolute; inset: 0;
+    background-image: linear-gradient(rgba(255,77,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,77,0,0.05) 1px, transparent 1px);
+    background-size: 60px 60px;
+  }
+  .hero-content { position: relative; z-index: 2; padding: 0 80px; max-width: 900px; }
+  .hero-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 4px; color: var(--orange); text-transform: uppercase; margin-bottom: 20px; opacity: 0; animation: fadeUp 0.8s 0.2s forwards; }
+  .hero-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(72px, 10vw, 130px); line-height: 0.9; color: var(--white); margin-bottom: 24px; opacity: 0; animation: fadeUp 0.8s 0.4s forwards; }
+  .hero-title .accent { color: var(--orange); display: block; }
+  .hero-sub { font-size: 18px; font-weight: 300; color: var(--light); line-height: 1.7; max-width: 480px; margin-bottom: 40px; opacity: 0; animation: fadeUp 0.8s 0.6s forwards; }
+  .btn-row { display: flex; gap: 16px; opacity: 0; animation: fadeUp 0.8s 0.8s forwards; }
+  .btn-primary { background: var(--orange); color: #fff; border: none; padding: 16px 36px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); transition: background 0.3s, transform 0.2s; }
+  .btn-primary:hover { background: var(--orange2); transform: translateY(-2px); }
+  .btn-ghost { background: transparent; color: var(--white); border: 1px solid rgba(255,255,255,0.3); padding: 16px 36px; font-family: 'Barlow Condensed', sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 3px; text-transform: uppercase; cursor: pointer; clip-path: polygon(8px 0%, 100% 0%, calc(100% - 8px) 100%, 0% 100%); transition: all 0.3s; }
+  .btn-ghost:hover { border-color: var(--orange); color: var(--orange); }
+  .hero-stats { position: absolute; right: 80px; bottom: 80px; display: flex; gap: 48px; z-index: 2; opacity: 0; animation: fadeUp 0.8s 1s forwards; }
+  .stat { text-align: center; }
+  .stat-num { font-family: 'Bebas Neue', sans-serif; font-size: 48px; color: var(--orange); line-height: 1; }
+  .stat-label { font-size: 11px; letter-spacing: 2px; color: var(--gray); text-transform: uppercase; }
+
+  /* SECTIONS */
+  section { padding: 100px 80px; }
+  .section-tag { font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 5px; color: var(--orange); text-transform: uppercase; margin-bottom: 16px; }
+  .section-title { font-family: 'Bebas Neue', sans-serif; font-size: clamp(42px, 5vw, 72px); line-height: 1; margin-bottom: 20px; }
+  .section-line { width: 60px; height: 3px; background: var(--orange); margin-bottom: 40px; }
+  .section-desc { font-size: 16px; font-weight: 300; color: var(--light); line-height: 1.8; max-width: 560px; }
+
+  /* ABOUT */
+  #about { background: var(--dark); }
+  .about-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .about-img-wrap { position: relative; }
+  .about-img {
+    width: 100%; aspect-ratio: 4/5; object-fit: cover;
+    filter: grayscale(30%);
+    clip-path: polygon(0 0, 90% 0, 100% 10%, 100% 100%, 10% 100%, 0 90%);
+  }
+  .about-badge {
+    position: absolute; bottom: -20px; right: -20px;
+    background: var(--orange); width: 140px; height: 140px;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+  .about-badge span:first-child { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: #fff; }
+  .about-badge span:last-child { font-size: 10px; letter-spacing: 2px; color: rgba(255,255,255,0.8); }
+  .about-points { margin-top: 32px; display: flex; flex-direction: column; gap: 16px; }
+  .about-point { display: flex; align-items: center; gap: 12px; font-size: 15px; color: var(--light); }
+  .about-point::before { content: '▶'; color: var(--orange); font-size: 10px; flex-shrink: 0; }
+
+  /* SERVICES */
+  #services { background: var(--black); }
+  .services-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; margin-top: 60px; }
+  .service-card {
+    background: var(--card); padding: 40px 32px; position: relative; overflow: hidden;
+    transition: transform 0.3s, background 0.3s; cursor: default;
+    border-top: 3px solid transparent;
+  }
+  .service-card::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(255,77,0,0.06), transparent); opacity: 0; transition: opacity 0.3s; }
+  .service-card:hover { transform: translateY(-6px); background: #1e1e1e; border-top-color: var(--orange); }
+  .service-card:hover::before { opacity: 1; }
+  .service-icon { font-size: 36px; margin-bottom: 20px; display: block; }
+  .service-card h3 { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--white); letter-spacing: 1px; margin-bottom: 12px; }
+  .service-card p { font-size: 14px; color: var(--gray); line-height: 1.7; }
+
+  /* GALLERY */
+  #gallery { background: var(--dark); }
+  .gallery-grid { display: grid; grid-template-columns: repeat(3, 1fr); grid-template-rows: 240px 240px; gap: 8px; margin-top: 60px; }
+  .gallery-item { overflow: hidden; position: relative; cursor: pointer; }
+  .gallery-item:first-child { grid-row: 1 / 3; }
+  .gallery-item img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s, filter 0.5s; filter: grayscale(20%); }
+  .gallery-item:hover img { transform: scale(1.07); filter: grayscale(0%) brightness(1.1); }
+  .gallery-overlay { position: absolute; inset: 0; background: linear-gradient(to top, rgba(255,77,0,0.6), transparent); opacity: 0; transition: opacity 0.4s; display: flex; align-items: flex-end; padding: 16px; }
+  .gallery-item:hover .gallery-overlay { opacity: 1; }
+  .gallery-overlay span { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: #fff; }
+
+  /* FOUNDER */
+  #founder { background: var(--black); }
+  .founder-wrap { display: grid; grid-template-columns: 380px 1fr; gap: 80px; align-items: center; margin-top: 60px; }
+  .founder-photo-wrap { position: relative; }
+  .founder-photo {
+    width: 100%; aspect-ratio: 3/4; object-fit: cover;
+    clip-path: polygon(0 0, 85% 0, 100% 15%, 100% 100%, 15% 100%, 0 85%);
+    filter: grayscale(20%);
+  }
+  .founder-name { font-family: 'Bebas Neue', sans-serif; font-size: 52px; color: var(--white); line-height: 1; margin-bottom: 8px; }
+  .founder-title { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; letter-spacing: 4px; color: var(--orange); text-transform: uppercase; margin-bottom: 24px; }
+  .founder-bio { font-size: 15px; font-weight: 300; color: var(--light); line-height: 1.9; margin-bottom: 32px; }
+  .founder-creds { display: flex; gap: 32px; }
+  .cred-num { font-family: 'Bebas Neue', sans-serif; font-size: 40px; color: var(--orange); line-height: 1; }
+  .cred-label { font-size: 11px; letter-spacing: 2px; color: var(--gray); text-transform: uppercase; }
+  .quote-mark { font-family: 'Bebas Neue', sans-serif; font-size: 120px; color: var(--orange); opacity: 0.15; line-height: 0.6; margin-bottom: 8px; }
+  blockquote { font-family: 'Bebas Neue', sans-serif; font-size: 28px; color: var(--white); line-height: 1.3; margin-bottom: 32px; letter-spacing: 1px; }
+
+  /* REVIEWS */
+  #reviews { background: var(--dark); }
+  .reviews-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 60px; }
+  .review-card {
+    background: var(--card); padding: 32px; position: relative;
+    border-left: 3px solid var(--orange);
+    transition: transform 0.3s;
+  }
+  .review-card:hover { transform: translateY(-4px); }
+  .stars { color: var(--orange); font-size: 14px; margin-bottom: 16px; letter-spacing: 2px; }
+  .review-text { font-size: 14px; color: var(--light); line-height: 1.8; margin-bottom: 24px; font-style: italic; }
+  .reviewer { display: flex; align-items: center; gap: 14px; }
+  .reviewer-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--orange); display: flex; align-items: center; justify-content: center; font-family: 'Bebas Neue', sans-serif; font-size: 18px; color: #fff; flex-shrink: 0; }
+  .reviewer-name { font-family: 'Barlow Condensed', sans-serif; font-weight: 700; font-size: 15px; letter-spacing: 1px; }
+  .reviewer-meta { font-size: 12px; color: var(--gray); margin-top: 2px; }
+
+  /* FORMS */
+  #login, #register, #feedback { background: var(--black); }
+  .form-wrap { display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: start; }
+  .form-box { background: var(--card); padding: 48px; border-top: 3px solid var(--orange); position: relative; overflow: hidden; }
+  .form-box::before { content: ''; position: absolute; top: 0; right: 0; width: 80px; height: 80px; background: linear-gradient(135deg, transparent 50%, rgba(255,77,0,0.1) 50%); }
+  .form-title { font-family: 'Bebas Neue', sans-serif; font-size: 36px; color: var(--white); margin-bottom: 8px; letter-spacing: 1px; }
+  .form-sub { font-size: 13px; color: var(--gray); margin-bottom: 32px; }
+  .form-group { margin-bottom: 20px; }
+  .form-group label { display: block; font-family: 'Barlow Condensed', sans-serif; font-size: 12px; letter-spacing: 3px; text-transform: uppercase; color: var(--gray); margin-bottom: 8px; }
+  .form-group input, .form-group textarea {
+    width: 100%; background: rgba(255,255,255,0.04); border: 1px solid rgba(255,255,255,0.1);
+    color: var(--white); padding: 14px 16px; font-family: 'Barlow', sans-serif; font-size: 14px;
+    outline: none; transition: border-color 0.3s;
+  }
+  .form-group input:focus, .form-group textarea:focus { border-color: var(--orange); }
+  .form-group textarea { resize: vertical; min-height: 100px; }
+  .form-error { display: none; font-size: 12px; color: #ff4444; margin-top: 6px; }
+  .form-success { display: none; background: rgba(255,77,0,0.15); border: 1px solid var(--orange); padding: 12px 16px; font-size: 13px; color: var(--orange); margin-bottom: 16px; }
+
+  /* FOOTER */
+  footer {
+    background: #050505; border-top: 1px solid rgba(255,77,0,0.2);
+    padding: 48px 80px; display: flex; align-items: center; justify-content: space-between;
+  }
+  .footer-logo { font-family: 'Bebas Neue', sans-serif; font-size: 32px; color: var(--orange); letter-spacing: 3px; }
+  .footer-logo span { color: var(--white); }
+  .footer-copy { font-size: 13px; color: var(--gray); }
+  .footer-tagline { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; letter-spacing: 3px; text-transform: uppercase; color: rgba(255,77,0,0.5); }
+
+  /* ANIMATIONS */
+  @keyframes fadeUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+  /* SCROLL REVEAL */
+  .reveal { opacity: 0; transform: translateY(40px); transition: opacity 0.7s, transform 0.7s; }
+  .reveal.visible { opacity: 1; transform: translateY(0); }
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<nav>
+  <div class="logo">IRON<span>FORGE</span></div>
+  <ul>
+    <li><a href="#home">Home</a></li>
+    <li><a href="#about">About</a></li>
+    <li><a href="#services">Services</a></li>
+    <li><a href="#gallery">Gallery</a></li>
+    <li><a href="#founder">Founder</a></li>
+    <li><a href="#reviews">Reviews</a></li>
+    <li><a href="#login">Login</a></li>
+    <li><a href="#register">Register</a></li>
+    <li><a href="#feedback">Contact</a></li>
+  </ul>
+</nav>
+
+<!-- HERO -->
+<section id="home">
+  <div class="hero-bg"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-content">
+    <p class="hero-tag">Est. 2010 · Premium Fitness</p>
+    <h1 class="hero-title">FORGE<span class="accent">YOUR</span>LEGEND</h1>
+    <p class="hero-sub">More than a gym — a movement. Build strength, ignite discipline, and transform your body with world-class coaching and elite facilities.</p>
+    <div class="btn-row">
+      <button class="btn-primary" onclick="document.getElementById('register').scrollIntoView({behavior:'smooth'})">JOIN NOW</button>
+      <button class="btn-ghost" onclick="document.getElementById('services').scrollIntoView({behavior:'smooth'})">EXPLORE</button>
+    </div>
+  </div>
+  <div class="hero-stats">
+    <div class="stat"><div class="stat-num">5K+</div><div class="stat-label">Members</div></div>
+    <div class="stat"><div class="stat-num">14</div><div class="stat-label">Years</div></div>
+    <div class="stat"><div class="stat-num">30+</div><div class="stat-label">Coaches</div></div>
+    <div class="stat"><div class="stat-num">99%</div><div class="stat-label">Satisfaction</div></div>
+  </div>
+</section>
+
+<!-- ABOUT -->
+<section id="about">
+  <div class="about-grid">
+    <div class="about-img-wrap reveal">
+      <img class="about-img" src="pics/inter.jpeg" alt="Gym interior">
+      <div class="about-badge"><span>14</span><span>YEARS</span></div>
+    </div>
+    <div class="reveal">
+      <p class="section-tag">Who We Are</p>
+      <h2 class="section-title">NOT JUST A GYM.<br>A FORGE.</h2>
+      <div class="section-line"></div>
+      <p class="section-desc">IronForge was built on a single principle: every person who walks through our doors deserves to become the strongest version of themselves. We combine cutting-edge equipment with elite coaching methodology.</p>
+      <div class="about-points">
+        <div class="about-point">State-of-the-art equipment across 12,000 sq. ft.</div>
+        <div class="about-point">Certified coaches with national &amp; international credentials</div>
+        <div class="about-point">Personalised training programs for every fitness level</div>
+        <div class="about-point">Nutrition consultation &amp; recovery science labs</div>
+        <div class="about-point">Open 5 AM – midnight, 365 days a year</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section id="services">
+  <div class="reveal">
+    <p class="section-tag">What We Offer</p>
+    <h2 class="section-title">ELITE PROGRAMS</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="services-grid reveal">
+    <div class="service-card">
+      <span class="service-icon">🏋️</span>
+      <h3>Strength &amp; Powerlifting</h3>
+      <p>Olympic lifting platforms, powerlifting stations, and progressive overload programming designed by championship coaches.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🔥</span>
+      <h3>HIIT &amp; Conditioning</h3>
+      <p>High-intensity interval training sessions that torch calories and build cardiovascular endurance in 45 minutes flat.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🥊</span>
+      <h3>Combat &amp; Boxing</h3>
+      <p>Full-size boxing ring, heavy bags, and MMA training zones led by professional fighters and certified coaches.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🧘</span>
+      <h3>Yoga &amp; Mobility</h3>
+      <p>Dedicated yoga studio with daily classes from beginner to advanced, plus mobility work to keep you injury-free.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">🥗</span>
+      <h3>Nutrition Coaching</h3>
+      <p>Registered dietitians create personalised meal plans aligned with your body composition and performance goals.</p>
+    </div>
+    <div class="service-card">
+      <span class="service-icon">📈</span>
+      <h3>Personal Training</h3>
+      <p>One-on-one sessions with dedicated trainers who track every rep, every metric, and every milestone of your journey.</p>
+    </div>
+  </div>
+</section>
+
+<!-- GALLERY -->
+<section id="gallery">
+  <div class="reveal">
+    <p class="section-tag">Inside IronForge</p>
+    <h2 class="section-title">THE FLOOR</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="gallery-grid reveal">
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1534438327276-14e5300c3a48?w=800&q=80" alt="Main floor">
+      <div class="gallery-overlay"><span>Main Floor</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1517836357463-d25dfeac3438?w=600&q=80" alt="Weight room">
+      <div class="gallery-overlay"><span>Weight Room</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1583454110551-21f2fa2afe61?w=600&q=80" alt="Cardio zone">
+      <div class="gallery-overlay"><span>Cardio Zone</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1581009137042-c552e485697a?w=600&q=80" alt="Boxing ring">
+      <div class="gallery-overlay"><span>Boxing Ring</span></div>
+    </div>
+    <div class="gallery-item">
+      <img src="https://images.unsplash.com/photo-1540497077202-7c8a3999166f?w=600&q=80" alt="Yoga studio">
+      <div class="gallery-overlay"><span>Yoga Studio</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOUNDER -->
+<section id="founder">
+  <div class="reveal">
+    <p class="section-tag">The Visionary</p>
+    <h2 class="section-title">MEET THE FOUNDER</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="founder-wrap">
+    <div class="founder-photo-wrap reveal">
+      <img class="founder-photo" src="pics/brahma.jpeg" alt="Founder">
+    </div>
+    <div class="reveal">
+      <div class="quote-mark">"</div>
+      <blockquote>THE IRON NEVER LIES. IT HUMBLES YOU — AND THEN IT BUILDS YOU.</blockquote>
+      <h3 class="founder-name">BRAHMAIAH</h3>
+      <p class="founder-title">Founder &amp; Head Coach · IronForge</p>
+      <p class="founder-bio">Brahmaiah spent 8 years competing on the national powerlifting circuit before founding IronForge in 2010 with a single squat rack and a vision. A certified NSCA Strength &amp; Conditioning Specialist and two-time National Champion, he believed that transformational fitness should be accessible — not a luxury. Today, IronForge stands as the most respected independent gym in the region, built entirely on word-of-mouth, results, and relentless standards.</p>
+      <div class="founder-creds">
+        <div class="cred"><div class="cred-num">2×</div><div class="cred-label">National Champ</div></div>
+        <div class="cred"><div class="cred-num">NSCA</div><div class="cred-label">Certified CSCS</div></div>
+        <div class="cred"><div class="cred-num">14</div><div class="cred-label">Yrs Coaching</div></div>
+        <div class="cred"><div class="cred-num">5K+</div><div class="cred-label">Lives Changed</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- REVIEWS -->
+<section id="reviews">
+  <div class="reveal">
+    <p class="section-tag">Member Stories</p>
+    <h2 class="section-title">REAL RESULTS</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="reviews-grid reveal">
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"IronForge changed my life. I joined at 94 kg with no fitness background. Eighteen months later — 72 kg, competing in my first powerlifting meet. The coaches here genuinely care."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar">R</div>
+        <div><div class="reviewer-name">Riya Patel</div><div class="reviewer-meta">Member since 2022</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"Best gym I've ever been to, and I've trained in Mumbai, Dubai, and London. The programming is elite, the equipment is spotless, and the atmosphere is electric every single morning."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar">K</div>
+        <div><div class="reviewer-name">Karan Shah</div><div class="reviewer-meta">Member since 2021</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"Brahmaiah and his team helped me rehab a serious back injury and come back stronger than before. The personal training is worth every rupee — science-based, structured, and results-driven."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar">P</div>
+        <div><div class="reviewer-name">Priya Nair</div><div class="reviewer-meta">Member since 2020</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"The HIIT classes are no joke — I've tried every boutique fitness studio in the city and nothing comes close. Community here is incredible. These people become your family."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar">A</div>
+        <div><div class="reviewer-name">Aditya Verma</div><div class="reviewer-meta">Member since 2023</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"Signed up for nutrition coaching alongside my training plan. Lost 14 kg in 5 months without feeling deprived once. The holistic approach here is what separates IronForge from everyone else."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar">N</div>
+        <div><div class="reviewer-name">Neha Gupta</div><div class="reviewer-meta">Member since 2022</div></div>
+      </div>
+    </div>
+    <div class="review-card">
+      <div class="stars">★★★★★</div>
+      <p class="review-text">"I was intimidated walking in as a 52-year-old. Within a week I felt completely at home. IronForge is for everyone — every age, every level. Brahmaiah built something truly special here."</p>
+      <div class="reviewer">
+        <div class="reviewer-avatar">S</div>
+        <div><div class="reviewer-name">Suresh Iyer</div><div class="reviewer-meta">Member since 2019</div></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- LOGIN & REGISTER -->
+<section id="login" style="background:var(--dark);">
+  <div class="reveal">
+    <p class="section-tag">Member Access</p>
+    <h2 class="section-title">LOGIN &amp; REGISTER</h2>
+    <div class="section-line"></div>
+  </div>
+  <div class="form-wrap reveal" id="register">
+    <!-- LOGIN -->
+    <div class="form-box">
+      <h3 class="form-title">MEMBER LOGIN</h3>
+      <p class="form-sub">Access your dashboard, bookings, and progress tracker.</p>
+      <div class="form-success" id="login-success">&#10003; Welcome back! Redirecting to your dashboard…</div>
+      <div class="form-group">
+        <label>Username</label>
+        <input type="text" id="login-user" placeholder="Enter username">
+        <div class="form-error" id="err-login-user">Username is required.</div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="login-pass" placeholder="Enter password">
+        <div class="form-error" id="err-login-pass">Password must be at least 6 characters.</div>
+      </div>
+      <button class="btn-primary" style="width:100%;clip-path:none;margin-top:8px;" onclick="handleLogin()">LOGIN</button>
+    </div>
+    <!-- REGISTER -->
+    <div class="form-box">
+      <h3 class="form-title">JOIN IRONFORGE</h3>
+      <p class="form-sub">Create your account and start your transformation today.</p>
+      <div class="form-success" id="reg-success">&#10003; Account created! Welcome to IronForge.</div>
+      <div class="form-group">
+        <label>Full Name</label>
+        <input type="text" id="reg-name" placeholder="Enter your full name">
+        <div class="form-error" id="err-reg-name">Full name is required.</div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="reg-email" placeholder="Enter your email">
+        <div class="form-error" id="err-reg-email">Enter a valid email address.</div>
+      </div>
+      <div class="form-group">
+        <label>Password</label>
+        <input type="password" id="reg-pass" placeholder="Min. 6 characters">
+        <div class="form-error" id="err-reg-pass">Password must be at least 6 characters.</div>
+      </div>
+      <div class="form-group">
+        <label>Confirm Password</label>
+        <input type="password" id="reg-confirm" placeholder="Repeat password">
+        <div class="form-error" id="err-reg-confirm">Passwords do not match.</div>
+      </div>
+      <button class="btn-primary" style="width:100%;clip-path:none;margin-top:8px;" onclick="handleRegister()">CREATE ACCOUNT</button>
+    </div>
+  </div>
+</section>
+
+<!-- FEEDBACK -->
+<section id="feedback">
+  <div class="reveal">
+    <p class="section-tag">Get In Touch</p>
+    <h2 class="section-title">CONTACT US</h2>
+    <div class="section-line"></div>
+  </div>
+  <div style="display:grid;grid-template-columns:1fr 420px;gap:80px;align-items:start;" class="reveal">
+    <div class="form-box">
+      <h3 class="form-title">SEND A MESSAGE</h3>
+      <p class="form-sub">Questions, memberships, or just want to say hello — we're here.</p>
+      <div class="form-success" id="fb-success">&#10003; Message sent! We'll respond within 24 hours.</div>
+      <div class="form-group">
+        <label>Name</label>
+        <input type="text" id="fb-name" placeholder="Your name">
+        <div class="form-error" id="err-fb-name">Name is required.</div>
+      </div>
+      <div class="form-group">
+        <label>Email</label>
+        <input type="email" id="fb-email" placeholder="Your email">
+        <div class="form-error" id="err-fb-email">Enter a valid email address.</div>
+      </div>
+      <div class="form-group">
+        <label>Message</label>
+        <textarea id="fb-msg" placeholder="How can we help you?"></textarea>
+        <div class="form-error" id="err-fb-msg">Please write a message.</div>
+      </div>
+      <button class="btn-primary" style="clip-path:none;" onclick="handleFeedback()">SEND MESSAGE</button>
+    </div>
+    <div style="padding-top:16px;">
+      <div style="margin-bottom:40px;">
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:2px;margin-bottom:8px;">LOCATION</p>
+        <p style="font-size:14px;color:var(--light);line-height:1.8;">IronForge Gym, 4th Floor, Fitness Tower,<br>SG Highway, Ahmedabad, Gujarat 380054</p>
+      </div>
+      <div style="margin-bottom:40px;">
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:2px;margin-bottom:8px;">HOURS</p>
+        <p style="font-size:14px;color:var(--light);line-height:1.8;">Mon – Fri: 5:00 AM – 12:00 AM<br>Sat – Sun: 6:00 AM – 10:00 PM<br>Public Holidays: 7:00 AM – 8:00 PM</p>
+      </div>
+      <div>
+        <p style="font-family:'Bebas Neue',sans-serif;font-size:20px;color:var(--orange);letter-spacing:2px;margin-bottom:8px;">CONTACT</p>
+        <p style="font-size:14px;color:var(--light);line-height:1.8;">📞 +91 83095 XXXXX<br>✉ forge@ironforge.in<br>📸 @ironforge.gym</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div>
+    <div class="footer-logo">IRON<span>FORGE</span></div>
+    <div class="footer-tagline" style="margin-top:6px;">Strength. Discipline. Legacy.</div>
+  </div>
+  <div class="footer-copy">&copy; 2024 IronForge Gym. All Rights Reserved.</div>
+</footer>
+
+<script>
+  // Scroll reveal
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+  }, { threshold: 0.1 });
+  reveals.forEach(el => observer.observe(el));
+
+  // Nav scroll effect
+  window.addEventListener('scroll', () => {
+    const nav = document.querySelector('nav');
+    nav.style.background = window.scrollY > 80 ? 'rgba(10,10,10,0.97)' : 'rgba(10,10,10,0.92)';
+  });
+
+  function showError(id, show) {
+    document.getElementById(id).style.display = show ? 'block' : 'none';
+  }
+  function showSuccess(id) {
+    const el = document.getElementById(id);
+    el.style.display = 'block';
+    setTimeout(() => el.style.display = 'none', 4000);
+  }
+
+  function handleLogin() {
+    const u = document.getElementById('login-user').value.trim();
+    const p = document.getElementById('login-pass').value;
+    let valid = true;
+    if (!u) { showError('err-login-user', true); valid = false; } else showError('err-login-user', false);
+    if (p.length < 6) { showError('err-login-pass', true); valid = false; } else showError('err-login-pass', false);
+    if (valid) showSuccess('login-success');
+  }
+
+  function handleRegister() {
+    const name = document.getElementById('reg-name').value.trim();
+    const email = document.getElementById('reg-email').value.trim();
+    const pass = document.getElementById('reg-pass').value;
+    const confirm = document.getElementById('reg-confirm').value;
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let valid = true;
+    if (!name) { showError('err-reg-name', true); valid = false; } else showError('err-reg-name', false);
+    if (!emailRe.test(email)) { showError('err-reg-email', true); valid = false; } else showError('err-reg-email', false);
+    if (pass.length < 6) { showError('err-reg-pass', true); valid = false; } else showError('err-reg-pass', false);
+    if (pass !== confirm || !confirm) { showError('err-reg-confirm', true); valid = false; } else showError('err-reg-confirm', false);
+    if (valid) showSuccess('reg-success');
+  }
+
+  function handleFeedback() {
+    const name = document.getElementById('fb-name').value.trim();
+    const email = document.getElementById('fb-email').value.trim();
+    const msg = document.getElementById('fb-msg').value.trim();
+    const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    let valid = true;
+    if (!name) { showError('err-fb-name', true); valid = false; } else showError('err-fb-name', false);
+    if (!emailRe.test(email)) { showError('err-fb-email', true); valid = false; } else showError('err-fb-email', false);
+    if (!msg) { showError('err-fb-msg', true); valid = false; } else showError('err-fb-msg', false);
+    if (valid) {
+      showSuccess('fb-success');
+      document.getElementById('fb-name').value = '';
+      document.getElementById('fb-email').value = '';
+      document.getElementById('fb-msg').value = '';
+    }
+  }
+</script>
+</body>
+</html>
